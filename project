@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: spring-apps
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Example project 1
+  sourceRepos:
+    - '*'
+
+  destinations:
+    - namespace: spring-apps-dev
+      server: https://kubernetes.default.svc
+      name: in-cluster
+
+  roles:
+    - name: read-only
+      description: Read-only privileges to my-project
+      policies:
+      - p, proj:spring-apps:read-only, applications, get, spring-apps/*, allow
+      groups:
+      - guest
+    - name: synconly
+      description: Sync privileges for guestbook-dev
+      policies:
+      - p, proj:spring-apps:synconly, applications, sync, spring-apps/*, allow
+      groups:
+      - deploy-agent
+      - guest
+    - name: 'mahdi'
+      description: master role
+      policies:
+      - p, proj:spring-apps:master, *, *, spring-apps/*, allow
